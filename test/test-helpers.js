@@ -230,6 +230,17 @@ function cleanTables(db) {
   )
 }
 
+function seedUsers(db, users) {
+  const preppedUsers = users.map(user => ({
+    ...user,
+    password: bcrypt.hashSync(user.password, 1)
+  }))
+  return db.into('thingful_users').insert(preppedUsers)
+    .then(() => {
+      db.raw(`SELECT setval('thingful_users_id_seq', ?)`, [users[user.length-1].id])
+    })
+}
+
 function seedThingsTables(db, users, things, reviews=[]) {
   return db
     .into('thingful_users')
